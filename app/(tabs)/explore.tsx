@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, FlatList, TextInput, Image, Platform } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -8,6 +8,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function TabTwoScreen() {
+
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -15,6 +17,31 @@ export default function TabTwoScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>
+{/* 
+                  <TextInput
+                  value={selectedItem}
+                  placeholder="Select an item..."
+                  style = {styles.input}
+                  onChangeText={setSelectedItem}
+                />
+                <FlatList
+                  data={inventoryIndex}
+                  renderItem={({item, index}) => (
+                    <TouchableOpacity
+                      onPress={() => onBankSelected(item?.bank)}>
+                      <VariantsBox>
+                        <Text
+                          >
+                          {item?.bank || ''}
+                        </Text>
+                      </VariantsBox>
+                    </TouchableOpacity>
+                  )}
+                  keyExtractor={item => item.bank}
+                /> */}
+
+
+
       <ThemedText>This app includes example code to help you get started.</ThemedText>
       <Collapsible title="File-based routing">
         <ThemedText>
@@ -89,6 +116,13 @@ export default function TabTwoScreen() {
 }
 
 const styles = StyleSheet.create({
+    input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+
   headerImage: {
     color: '#808080',
     bottom: -90,
