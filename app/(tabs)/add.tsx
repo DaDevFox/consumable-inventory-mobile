@@ -1,14 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import { StyleSheet, Image, Platform, Button } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import React, { useState } from "react"
-import {ProgressBar} from "rn-multi-progress-bar"
-import { SelectProvider, Select, OptionsType, OptionType } from "@mobile-reality/react-native-select-pro"
+import React, { useRef, useState } from "react"
+import * as Progress from 'react-native-progress'
+// import {ProgressBar} from "rn-multi-progress-bar"
+import { SelectProvider, Select, OptionsType, OptionType, SelectRef } from "@mobile-reality/react-native-select-pro"
 
 type IndexItem = {
   id: number;
@@ -84,9 +85,12 @@ export default function TabTwoScreen() {
   const [currentAdditionAmount, setcurrentAdditionAmount] = useState(1);
 
   const ItemAdditionOverview: React.FC<ItemAdditionProps> = ({name, currentCount}) =>{
-    return (<div><ThemedText>{name}: </ThemedText><ProgressBar
+    return (<div><ThemedText>{name}: </ThemedText>
+    <Progress.Bar progress={currentCount / HighestItemAmount} animated={true}/>
+    
+    {/* <ProgressBar
     barHeight={10}
-    shouldAnimate={true}
+    shouldAnimate={false}
     animateDuration={500} 
     data={
       [
@@ -94,7 +98,8 @@ export default function TabTwoScreen() {
         {progress: Math.min(currentAdditionAmount, HighestItemAmount - currentCount), color: "rgb(0, 0, 230)"},
         {progress: (HighestItemAmount - currentCount - Math.min(currentAdditionAmount, HighestItemAmount - currentCount) / HighestItemAmount), color: "rgb(0, 210, 0)"}
       ]}
-    /></div>);
+    /> */}
+    </div>);
   };
 
   // TODO: merge multiple option categories with sections support in future
@@ -117,18 +122,27 @@ export default function TabTwoScreen() {
             setSelectedItems(temp);
         } 
 
+
+  const selectRef = useRef<SelectRef<{label: string, value: string}>>(null);
+
+  const onButtonPress = () => {
+    // reset selected
+    setSelectedItems(new Map<number, IndexItem>())
+    selectRef.current?.clear();
+  };
+
   return (
-      <SelectProvider>
       <ParallaxScrollView
         headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
         headerImage={<Ionicons size={310} name="earth" style={styles.headerImage} />}>
+      <SelectProvider>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Add</ThemedText>
         </ThemedView>
-        
-        <p>{selectedItems.size}</p>
         <Select 
+        ref={selectRef}
         multiple={true} 
+        placeholderText='Select items...'
         searchable={true}
         closeOptionsListOnSelect={false}
         options={itemSelectOptions}
@@ -137,80 +151,11 @@ export default function TabTwoScreen() {
         onSectionSelect={(options:OptionType<{label:string, value:string}>[], optionIndexes:number[]) => {options.forEach((value, index) => onSelect(value, optionIndexes[index]))}}
         onSectionRemove={(options:OptionType<{label:string, value:string}>[], optionIndexes:number[]) => {options.forEach((value, index) => onRemove(value, optionIndexes[index]))}}
          />
-          {itemAdditionOverviews}
+          {(itemAdditionOverviews != false ? <div><ThemedText type='subtitle'>Current Stocks:</ThemedText>{itemAdditionOverviews}</div> : "")}
 
-
-        <ThemedText>This app includes example code to help you get started.</ThemedText>
-        <Collapsible title="File-based routing">
-          <ThemedText>
-            This app has two screens:{' '}
-            <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-            <ThemedText type="defaultSemiBold">app/(tabs)/add.tsx</ThemedText>
-          </ThemedText>
-          <ThemedText>
-            The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-            sets up the tab navigator.
-          </ThemedText>
-          <ExternalLink href="https://docs.expo.dev/router/introduction">
-            <ThemedText type="link">Learn more</ThemedText>
-          </ExternalLink>
-        </Collapsible>
-        <Collapsible title="Android, iOS, and web support">
-          <ThemedText>
-            You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-            <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-          </ThemedText>
-        </Collapsible>
-        <Collapsible title="Images">
-          <ThemedText>
-            For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-            <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-            different screen densities
-          </ThemedText>
-          <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-          <ExternalLink href="https://reactnative.dev/docs/images">
-            <ThemedText type="link">Learn more</ThemedText>
-          </ExternalLink>
-        </Collapsible>
-        <Collapsible title="Custom fonts">
-          <ThemedText>
-            Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-            <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-              custom fonts such as this one.
-            </ThemedText>
-          </ThemedText>
-          <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-            <ThemedText type="link">Learn more</ThemedText>
-          </ExternalLink>
-        </Collapsible>
-        <Collapsible title="Light and dark mode components">
-          <ThemedText>
-            This template has light and dark mode support. The{' '}
-            <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-            what the user's current color scheme is, and so you can adjust UI colors accordingly.
-          </ThemedText>
-          <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-            <ThemedText type="link">Learn more</ThemedText>
-          </ExternalLink>
-        </Collapsible>
-        <Collapsible title="Animations">
-          <ThemedText>
-            This template includes an example of an animated component. The{' '}
-            <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-            the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-            to create a waving hand animation.
-          </ThemedText>
-          {Platform.select({
-            ios: (
-              <ThemedText>
-                The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-                component provides a parallax effect for the header image.
-              </ThemedText>
-            ),
-          })}
-        </Collapsible>
-      </ParallaxScrollView>
+        <Button title="Add all" onPress={onButtonPress}/>
       </SelectProvider>
+      </ParallaxScrollView>
   );
 }
 
